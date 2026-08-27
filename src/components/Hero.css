@@ -1,0 +1,120 @@
+/* ============ Hero ============ */
+.hero {
+  position: relative;
+  background: linear-gradient(135deg, var(--green-900) 0%, var(--green-700) 60%, #1d7a41 100%);
+  overflow: hidden;
+  padding: 60px 0 40px;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15% 30%, rgba(251, 191, 36, 0.18), transparent 40%),
+    radial-gradient(circle at 85% 15%, rgba(255, 255, 255, 0.08), transparent 35%);
+}
+
+.hero-inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  align-items: center;
+  gap: 40px;
+  min-height: 480px;
+}
+
+.hero-tag {
+  display: inline-block;
+  background: rgba(251, 191, 36, 0.15);
+  border: 1px solid var(--gold-500);
+  color: var(--gold-300);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  padding: 8px 18px;
+  border-radius: 30px;
+  margin-bottom: 20px;
+}
+
+.hero-content h1 {
+  color: var(--white);
+  font-size: clamp(2.2rem, 5vw, 3.3rem);
+  font-weight: 800;
+  margin-bottom: 18px;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.hero-content p {
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 1.02rem;
+  max-width: 520px;
+  margin-bottom: 30px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.hero-dots {
+  display: flex;
+  gap: 10px;
+  margin-top: 40px;
+}
+
+.hero-dots .dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s;
+  padding: 0;
+}
+
+.hero-dots .dot.active {
+  background: var(--gold-500);
+  border-color: var(--gold-500);
+  transform: scale(1.3);
+}
+
+.hero-image {
+  position: relative;
+}
+
+.hero-image-frame {
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  border-radius: 24px;
+  padding: 12px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+  transform: rotate(1.5deg);
+  transition: transform 0.4s ease;
+}
+
+.hero-image-frame:hover { transform: rotate(0) scale(1.02); }
+
+.hero-image-frame svg {
+  border-radius: 16px;
+  display: block;
+}
+
+.hero-wave {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 70px;
+}
+
+@media (max-width: 900px) {
+  .hero-inner { grid-template-columns: 1fr; text-align: center; }
+  .hero-content p { margin-left: auto; margin-right: auto; }
+  .hero-actions { justify-content: center; }
+  .hero-dots { justify-content: center; }
+  .hero-image { max-width: 520px; margin: 0 auto; }
+}

@@ -1,0 +1,80 @@
+.about-section {
+  background: var(--white);
+  padding: 80px 0;
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.about-lead {
+  font-size: 1.08rem;
+  color: var(--dark);
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.about-body {
+  color: var(--gray);
+  margin-bottom: 24px;
+}
+
+.about-points {
+  list-style: none;
+  margin-bottom: 28px;
+}
+
+.about-points li {
+  padding: 8px 0;
+  font-size: 0.95rem;
+  color: var(--dark);
+  border-bottom: 1px dashed var(--light-gray);
+}
+
+.about-visual {
+  position: relative;
+}
+
+.about-photo {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  border: 6px solid var(--white);
+}
+
+.about-photo svg { display: block; }
+
+.about-badge {
+  position: absolute;
+  bottom: -24px;
+  left: -24px;
+  background: linear-gradient(135deg, var(--gold-400), var(--gold-500));
+  color: var(--green-900);
+  border-radius: 18px;
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: var(--shadow-md);
+}
+
+.about-badge-num {
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.about-badge-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 900px) {
+  .about-grid { grid-template-columns: 1fr; gap: 44px; }
+  .about-badge { left: 10px; bottom: -18px; }
+}

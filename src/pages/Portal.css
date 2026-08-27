@@ -1,0 +1,110 @@
+/* Portal dashboards */
+.portal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 24px 28px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.portal-welcome {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.portal-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--green-600), var(--green-800));
+  color: var(--white);
+  font-size: 1.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(20, 83, 45, 0.3);
+}
+
+.portal-welcome h2 { font-size: 1.4rem; }
+.portal-welcome p { color: var(--gray); font-size: 0.88rem; }
+
+.portal-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+  margin-bottom: 28px;
+}
+
+.portal-stat {
+  text-align: center;
+  padding: 24px 16px;
+}
+
+.portal-stat-icon { font-size: 2rem; display: block; margin-bottom: 10px; }
+
+.portal-stat strong {
+  display: block;
+  font-size: 1.35rem;
+  color: var(--green-900);
+  word-break: break-word;
+}
+
+.portal-stat > span:last-child {
+  color: var(--gray);
+  font-size: 0.82rem;
+}
+
+.portal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 26px;
+  margin-bottom: 28px;
+}
+
+.profile-list div {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--light-gray);
+  font-size: 0.9rem;
+  gap: 12px;
+}
+
+.profile-list span { color: var(--gray); }
+.profile-list strong { color: var(--green-900); text-align: right; }
+
+.grade-badge {
+  background: var(--green-100);
+  color: var(--green-800);
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+}
+
+.class-chip {
+  display: inline-block;
+  background: var(--green-100);
+  color: var(--green-800);
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: 30px;
+  margin: 0 8px 10px 0;
+  font-size: 0.88rem;
+}
+
+@media (max-width: 900px) {
+  .portal-stats { grid-template-columns: repeat(2, 1fr); }
+  .portal-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 520px) {
+  .portal-stats { grid-template-columns: 1fr; }
+}

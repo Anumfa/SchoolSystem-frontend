@@ -1,0 +1,48 @@
+/* Admin dashboard extras */
+.status-chip {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.status-chip.pending { background: #fef3c7; color: #b45309; }
+.status-chip.approved { background: #dcfce7; color: #15803d; }
+.status-chip.rejected { background: #fee2e2; color: #b91c1c; }
+.status-chip.interview { background: #dbeafe; color: #1d4ed8; }
+.status-chip.completed { background: var(--light-gray); color: var(--gray); }
+.status-chip.upcoming { background: #dbeafe; color: #1d4ed8; }
+
+.action-btns { display: flex; gap: 6px; }
+
+.action-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn:hover { transform: scale(1.1); }
+.action-btn.approve { background: #dcfce7; color: #15803d; }
+.action-btn.approve:hover { background: #15803d; color: #fff; }
+.action-btn.interview { background: #dbeafe; color: #1d4ed8; }
+.action-btn.interview:hover { background: #1d4ed8; color: #fff; }
+.action-btn.reject { background: #fee2e2; color: #b91c1c; }
+.action-btn.reject:hover { background: #b91c1c; color: #fff; }
+
+.contact-link {
+  color: var(--green-800);
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.contact-link:hover { text-decoration: underline; }
