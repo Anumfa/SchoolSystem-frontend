@@ -14,6 +14,13 @@
 .status-chip.interview { background: #dbeafe; color: #1d4ed8; }
 .status-chip.completed { background: var(--light-gray); color: var(--gray); }
 .status-chip.upcoming { background: #dbeafe; color: #1d4ed8; }
+.status-chip.new { background: #fef3c7; color: #b45309; }
+.status-chip.read { background: #e0e7ff; color: #4338ca; }
+.status-chip.replied { background: #dcfce7; color: #15803d; }
+
+/* Unread contact messages stand out in the inbox */
+tr.row-new { background: #fffbeb; }
+tr.row-new td { font-weight: 600; }
 
 .action-btns { display: flex; gap: 6px; }
 
@@ -282,6 +289,21 @@
 @media (max-width: 640px) {
   .admin-form .form-row { grid-template-columns: 1fr; }
   .admin-gallery-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+}
+
+/* Reviews tab */
+.review-stars {
+  color: var(--gold-500);
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.review-cell {
+  min-width: 210px;
+  max-width: 340px;
+  white-space: normal;
+  font-size: 0.85rem;
+  color: var(--gray);
 }
 
 

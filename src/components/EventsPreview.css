@@ -17,6 +17,13 @@
   gap: 26px;
 }
 
+.events-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--gray);
+  padding: 30px 10px;
+}
+
 .event-card {
   padding: 0;
   overflow: hidden;

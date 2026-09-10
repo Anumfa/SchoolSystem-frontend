@@ -65,6 +65,9 @@ const AdminDashboard = () => {
   const [toast, setToast] = useState('');
   const [selected, setSelected] = useState(null);
   const [gallery, setGallery] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [selectedMessage, setSelectedMessage] = useState(null);
   const [eventForm, setEventForm] = useState(emptyEvent);
   const [galleryForm, setGalleryForm] = useState(emptyGalleryItem);
   const [saving, setSaving] = useState(false);
@@ -79,6 +82,8 @@ const AdminDashboard = () => {
     api.get('/events').then((r) => setEvents(r.data)).catch(() => {});
     api.get('/admissions').then((r) => setAdmissions(r.data)).catch(() => {});
     api.get('/gallery').then((r) => setGallery(r.data)).catch(() => {});
+    api.get('/reviews/all').then((r) => setReviews(r.data)).catch(() => {});
+    api.get('/contact').then((r) => setMessages(r.data)).catch(() => {});
   }, [user, navigate]);
 
   const logout = () => {
@@ -155,6 +160,54 @@ const AdminDashboard = () => {
     }
   };
 
+  const setReviewStatus = async (id, status) => {
+    try {
+      await api.put(`/reviews/${id}`, { status });
+      setReviews((prev) => prev.map((r) => (r._id === id ? { ...r, status } : r)));
+      notify(`Review marked as ${status} ✅`);
+    } catch (err) {
+      notify('Failed to update ❌');
+    }
+  };
+
+  const deleteReview = async (id) => {
+    try {
+      await api.delete(`/reviews/${id}`);
+      setReviews((prev) => prev.filter((r) => r._id !== id));
+      notify('Review deleted 🗑️');
+    } catch (err) {
+      notify('Failed to delete ❌');
+    }
+  };
+
+  const setMessageStatus = async (id, status, silent) => {
+    try {
+      await api.put(`/contact/${id}`, { status });
+      setMessages((prev) => prev.map((m) => (m._id === id ? { ...m, status } : m)));
+      setSelectedMessage((cur) => (cur && cur._id === id ? { ...cur, status } : cur));
+      if (!silent) notify(`Message marked as ${status} ✅`);
+    } catch (err) {
+      if (!silent) notify('Failed to update ❌');
+    }
+  };
+
+  // Opening a message marks it as read
+  const openMessage = (msg) => {
+    setSelectedMessage(msg);
+    if (msg.status === 'new') setMessageStatus(msg._id, 'read', true);
+  };
+
+  const deleteMessage = async (id) => {
+    try {
+      await api.delete(`/contact/${id}`);
+      setMessages((prev) => prev.filter((m) => m._id !== id));
+      setSelectedMessage((cur) => (cur && cur._id === id ? null : cur));
+      notify('Message deleted 🗑️');
+    } catch (err) {
+      notify('Failed to delete ❌');
+    }
+  };
+
   if (!user || user.role !== 'admin') return null;
 
   const pendingCount = admissions.filter((a) => a.status === 'pending').length;
@@ -188,6 +241,8 @@ const AdminDashboard = () => {
             ['admissions', `📋 Applications (${admissions.length})`],
             ['events', `📅 Events (${events.length})`],
             ['gallery', `🖼️ Gallery (${gallery.length})`],
+            ['reviews', `⭐ Reviews (${reviews.filter((r) => r.status === 'pending').length})`],
+            ['messages', `✉️ Messages (${messages.filter((m) => m.status === 'new').length})`],
           ].map(([key, label]) => (
             <button key={key} className={`filter-btn ${tab === key ? 'active' : ''}`} onClick={() => setTab(key)}>
               {label}
@@ -537,6 +592,84 @@ const AdminDashboard = () => {
             </div>
           </>
         )}
+
+        {/* Reviews */}
+        {tab === 'reviews' && (
+          <div className="card">
+            <h3 className="mb-2">⭐ Reviews ({reviews.length})</h3>
+            {reviews.length === 0 ? (
+              <p style={{ color: 'var(--gray)' }}>No reviews submitted yet.</p>
+            ) : (
+              <table className="fee-table">
+                <thead>
+                  <tr><th>Name</th><th>Role</th><th>Rating</th><th>Review</th><th>Status</th><th>Actions</th></tr>
+                </thead>
+                <tbody>
+                  {reviews.map((r) => (
+                    <tr key={r._id}>
+                      <td>{r.name}</td>
+                      <td>{r.role}</td>
+                      <td><span className="review-stars">{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</span></td>
+                      <td className="review-cell">{r.message}</td>
+                      <td><span className={`status-chip ${r.status}`}>{r.status}</span></td>
+                      <td>
+                        <div className="action-btns">
+                          <button className="action-btn approve" title="Approve (show on website)" onClick={() => setReviewStatus(r._id, 'approved')}>✓</button>
+                          <button className="action-btn reject" title="Reject" onClick={() => setReviewStatus(r._id, 'rejected')}>✗</button>
+                          <button className="action-btn view" title="Delete" onClick={() => deleteReview(r._id)}>🗑️</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        )}
+
+        {/* Contact messages */}
+        {tab === 'messages' && (
+          <div className="card">
+            <h3 className="mb-2">✉️ Contact Messages ({messages.length})</h3>
+            {messages.length === 0 ? (
+              <p style={{ color: 'var(--gray)' }}>
+                No messages yet — website ke Contact form se aane wale messages yahan dikhenge.
+              </p>
+            ) : (
+              <table className="fee-table">
+                <thead>
+                  <tr><th>From</th><th>Contact</th><th>Subject</th><th>Message</th><th>Received</th><th>Status</th><th>Actions</th></tr>
+                </thead>
+                <tbody>
+                  {messages.map((m) => (
+                    <tr key={m._id} className={m.status === 'new' ? 'row-new' : ''}>
+                      <td>{m.name}</td>
+                      <td>
+                        <a className="contact-link" href={`mailto:${m.email}`}>{m.email}</a>
+                        {m.phone && (
+                          <>
+                            <br />
+                            <a className="contact-link" href={`tel:${m.phone}`}>{m.phone}</a>
+                          </>
+                        )}
+                      </td>
+                      <td>{m.subject || '—'}</td>
+                      <td className="review-cell">{m.message}</td>
+                      <td>{m.createdAt ? new Date(m.createdAt).toLocaleDateString('en-GB') : '—'}</td>
+                      <td><span className={`status-chip ${m.status}`}>{m.status}</span></td>
+                      <td>
+                        <div className="action-btns">
+                          <button className="action-btn view" title="View full details" onClick={() => openMessage(m)}>👁️</button>
+                          <button className="action-btn reject" title="Delete" onClick={() => deleteMessage(m._id)}>🗑️</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        )}
       </div>
 
       {selected && (
@@ -571,6 +704,39 @@ const AdminDashboard = () => {
               <button className="btn btn-green" onClick={() => updateAdmission(selected._id, 'approved')}>✓ Approve</button>
               <button className="btn btn-outline" onClick={() => updateAdmission(selected._id, 'interview')}>👥 Interview</button>
               <button className="btn btn-outline" onClick={() => updateAdmission(selected._id, 'rejected')}>✗ Reject</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {selectedMessage && (
+        <div className="modal-overlay" onClick={() => setSelectedMessage(null)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-head">
+              <h3>✉️ Message Details</h3>
+              <button className="modal-close" onClick={() => setSelectedMessage(null)} aria-label="Close details">✕</button>
+            </div>
+
+            <div className="detail-grid">
+              <div className="detail-item"><span>From</span><strong>{selectedMessage.name}</strong></div>
+              <div className="detail-item"><span>Received</span><strong>{selectedMessage.createdAt ? new Date(selectedMessage.createdAt).toLocaleString('en-GB') : '—'}</strong></div>
+              <div className="detail-item"><span>Email</span><strong><a className="contact-link" href={`mailto:${selectedMessage.email}`}>{selectedMessage.email}</a></strong></div>
+              <div className="detail-item"><span>Phone</span><strong>{selectedMessage.phone ? <a className="contact-link" href={`tel:${selectedMessage.phone}`}>{selectedMessage.phone}</a> : '—'}</strong></div>
+              <div className="detail-item"><span>Subject</span><strong>{selectedMessage.subject || '—'}</strong></div>
+              <div className="detail-item"><span>Status</span><strong><span className={`status-chip ${selectedMessage.status}`}>{selectedMessage.status}</span></strong></div>
+              <div className="detail-item full"><span>Message</span><strong>{selectedMessage.message}</strong></div>
+            </div>
+
+            <div className="modal-actions">
+              <a
+                className="btn btn-green"
+                href={`mailto:${selectedMessage.email}?subject=${encodeURIComponent(`RE: ${selectedMessage.subject || 'Your enquiry'}`)}`}
+              >
+                ✉️ Reply by Email
+              </a>
+              <button className="btn btn-outline" onClick={() => setMessageStatus(selectedMessage._id, 'replied')}>✓ Mark as Replied</button>
+              <button className="btn btn-outline" onClick={() => setMessageStatus(selectedMessage._id, 'new')}>Mark Unread</button>
+              <button className="btn btn-outline" onClick={() => deleteMessage(selectedMessage._id)}>🗑️ Delete</button>
             </div>
           </div>
         </div>

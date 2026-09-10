@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import emailjs from '@emailjs/browser';
 import PageBanner from '../components/PageBanner.jsx';
+import api from '../api.js';
 import './PageStyles.css';
 
 const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
 const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
 const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
+const emptyForm = { name: '', email: '', phone: '', subject: '', message: '' };
+
 const Contact = () => {
-  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
+  const [form, setForm] = useState(emptyForm);
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -18,22 +21,44 @@ const Contact = () => {
     e.preventDefault();
     setLoading(true);
     setStatus(null);
+
+    // 1) Always save the message so it shows up in the admin panel inbox
+    let stored = false;
     try {
-      const templateParams = {
-        name: form.name,
-        email: form.email,
-        subject: form.subject || 'No subject',
-        message: form.message,
-      };
-      await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, { publicKey: PUBLIC_KEY });
-      setStatus({ type: 'success', msg: '✅ Message sent successfully! We will get back to you soon.' });
-      setForm({ name: '', email: '', subject: '', message: '' });
+      await api.post('/contact', form);
+      stored = true;
     } catch (err) {
-      setStatus({ type: 'error', msg: '⚠️ Email not sent. Please check EmailJS configuration or try again.' });
-      console.error('EmailJS error:', err);
-    } finally {
-      setLoading(false);
+      console.error('Could not save contact message:', err);
     }
+
+    // 2) Also try to email it via EmailJS
+    let emailed = false;
+    try {
+      await emailjs.send(
+        SERVICE_ID,
+        TEMPLATE_ID,
+        {
+          name: form.name,
+          email: form.email,
+          phone: form.phone || 'Not provided',
+          subject: form.subject || 'No subject',
+          message: form.message,
+        },
+        { publicKey: PUBLIC_KEY }
+      );
+      emailed = true;
+    } catch (err) {
+      console.error('EmailJS error:', err);
+    }
+
+    if (stored || emailed) {
+      setStatus({ type: 'success', msg: '✅ Message sent successfully! We will get back to you soon.' });
+      setForm(emptyForm);
+    } else {
+      setStatus({ type: 'error', msg: '⚠️ Message could not be sent. Please try again later.' });
+    }
+
+    setLoading(false);
   };
 
   return (
@@ -105,8 +130,10 @@ const Contact = () => {
               <div className="form-group">
                 <label>Your Email *</label>
                 <input type="email" name="email" value={form.email} onChange={handleChange} required placeholder="you@example.com" />
-              </div>
-              <div className="form-group">
+              </div>              <div className="form-group">
+                <label>Phone (optional)</label>
+                <input name="phone" value={form.phone} onChange={handleChange} placeholder="+92 300 1234567" />
+              </div>              <div className="form-group">
                 <label>Subject</label>
                 <input name="subject" value={form.subject} onChange={handleChange} placeholder="e.g. Admission enquiry" />
               </div>

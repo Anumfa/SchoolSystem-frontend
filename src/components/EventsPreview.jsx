@@ -5,17 +5,20 @@ import './EventsPreview.css';
 
 const EventsPreview = () => {
   const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     api
       .get('/events')
       .then((res) => {
-        const upcoming = res.data
+        const list = Array.isArray(res.data) ? res.data : [];
+        const upcoming = list
           .filter((e) => new Date(e.date) >= new Date())
           .slice(0, 3);
-        setEvents(upcoming.length ? upcoming : res.data.slice(0, 3));
+        setEvents(upcoming.length ? upcoming : list.slice(0, 3));
       })
-      .catch(() => setEvents([]));
+      .catch(() => setEvents([]))
+      .finally(() => setLoading(false));
   }, []);
 
   const formatDate = (d) =>
@@ -33,13 +36,19 @@ const EventsPreview = () => {
         </div>
 
         <div className="events-grid">
-          {events.length === 0 &&
+          {loading &&
             [0, 1, 2].map((i) => (
               <div key={i} className="event-card card">
                 <div className="event-card-img event-skeleton" />
                 <h3>Loading events…</h3>
               </div>
             ))}
+
+          {!loading && events.length === 0 && (
+            <p className="events-empty">
+              No upcoming events right now — please check back soon. 🗓️
+            </p>
+          )}
 
           {events.map((ev, i) => (
             <div key={ev._id} className="event-card card fade-up" style={{ animationDelay: `${i * 0.12}s` }}>
