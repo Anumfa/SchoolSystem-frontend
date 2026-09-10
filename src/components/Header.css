@@ -128,17 +128,18 @@
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 3px;
 }
 
 .nav-links a:not(.apply-btn):not(.logout-btn) {
-  padding: 10px 13px;
-  font-size: 0.92rem;
+  padding: 10px 9px;
+  font-size: 0.88rem;
   font-weight: 500;
   color: var(--dark);
   border-radius: 8px;
   transition: all 0.25s;
   position: relative;
+  white-space: nowrap;
 }
 
 .nav-links a:not(.apply-btn):not(.logout-btn)::after {
@@ -164,27 +165,63 @@
   width: 55%;
 }
 
-.apply-btn {
-  margin-left: 10px;
-  padding: 11px 24px;
-  font-size: 0.9rem;
+.nav-links .apply-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+  margin-left: 8px;
+  padding: 10px 18px;
+  font-size: 0.86rem;
+  line-height: 1.3;
 }
 
-.logout-btn {
-  margin-left: 6px;
-  padding: 10px 16px;
-  border: none;
+.nav-links .apply-arrow { transition: transform 0.25s; }
+.nav-links .apply-btn:hover .apply-arrow { transform: translateX(3px); }
+
+/* Same box metrics as .apply-btn so both buttons always line up */
+.nav-links .logout-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-left: 8px;
+  padding: 10px 15px;
+  border: 2px solid var(--green-100);
   background: var(--green-100);
   color: var(--green-800);
   font-family: 'Poppins', sans-serif;
   font-weight: 600;
-  font-size: 0.85rem;
-  border-radius: 30px;
+  font-size: 0.86rem;
+  line-height: 1.3;
+  border-radius: 50px;
   cursor: pointer;
   transition: all 0.25s;
 }
 
-.logout-btn:hover { background: var(--red); color: var(--white); }
+.logout-avatar {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--green-800);
+  color: var(--white);
+  font-size: 0.62rem;
+  line-height: 1;
+  transition: all 0.25s;
+}
+
+.nav-links .logout-btn:hover {
+  background: var(--red);
+  border-color: var(--red);
+  color: var(--white);
+  transform: translateY(-2px);
+}
+
+.nav-links .logout-btn:hover .logout-avatar { background: var(--white); color: var(--red); }
 
 .hamburger {
   display: none;
@@ -205,13 +242,21 @@
 }
 
 /* ============ Responsive ============ */
-@media (max-width: 1080px) {
-  .topbar-address { display: none; }
+/* Tighten a little more before the drawer takes over */
+@media (max-width: 1300px) {
   .nav-links a:not(.apply-btn):not(.logout-btn) { padding: 10px 8px; font-size: 0.85rem; }
+  .nav-links .apply-btn { margin-left: 6px; padding: 10px 15px; font-size: 0.84rem; }
+  .nav-links .logout-btn { margin-left: 6px; padding: 10px 13px; font-size: 0.84rem; gap: 5px; }
+  .logout-avatar { width: 16px; height: 16px; font-size: 0.58rem; }
 }
 
-@media (max-width: 920px) {
-  .topbar-right .portal-link { display: none; }
+@media (max-width: 1080px) {
+  .topbar-address { display: none; }
+}
+
+/* The full row needs ~1200px, so switch to the slide-out drawer below that.
+   (Previously 920px, which left the links squeezed and the buttons wrapping.) */
+@media (max-width: 1200px) {
   .nav-links {
     position: fixed;
     top: 0;
@@ -231,8 +276,19 @@
   .nav-links.open { right: 0; }
   .nav-links a { width: 100%; padding: 12px 10px !important; border-bottom: 1px solid var(--light-gray); }
   .nav-links a::after { display: none; }
-  .apply-btn, .logout-btn { margin: 14px 0 0 !important; width: 100%; text-align: center; }
+  .nav-links .apply-btn,
+  .nav-links .logout-btn {
+    margin: 14px 0 0 !important;
+    width: 100%;
+    padding: 12px 16px !important;
+    justify-content: center;
+    text-align: center;
+  }
   .hamburger { display: flex; z-index: 100; }
+}
+
+@media (max-width: 920px) {
+  .topbar-right .portal-link { display: none; }
 }
 
 @media (max-width: 520px) {

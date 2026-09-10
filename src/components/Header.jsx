@@ -14,6 +14,15 @@ const navLinks = [
   { to: '/contact', label: 'Contact' },
 ];
 
+// Honorifics we skip when picking a short display name (so "Mr. Ahmed Raza" → "Ahmed")
+const TITLES = ['mr', 'mrs', 'ms', 'miss', 'dr', 'prof', 'sir', 'madam'];
+
+const shortName = (fullName = '') => {
+  const parts = String(fullName).trim().split(/\s+/).filter(Boolean);
+  const named = parts.find((p) => !TITLES.includes(p.replace(/\./g, '').toLowerCase()));
+  return (named || parts[0] || '').replace(/\.$/, '');
+};
+
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -84,11 +93,20 @@ const Header = () => {
             </NavLink>
           ))}
           <Link to="/admissions" className="btn btn-gold apply-btn" onClick={() => setMenuOpen(false)}>
-            Apply Now →
+            <span className="apply-label">Apply Now</span>
+            <span className="apply-arrow" aria-hidden="true">→</span>
           </Link>
           {user && (
-            <button className="logout-btn" onClick={handleLogout}>
-              Logout ({user.name.split(' ')[0]})
+            <button
+              type="button"
+              className="logout-btn"
+              onClick={handleLogout}
+              title={`Signed in as ${user.name} (${user.role})`}
+            >
+              <span className="logout-avatar" aria-hidden="true">
+                {(shortName(user.name)[0] || 'U').toUpperCase()}
+              </span>
+              <span className="logout-text">Logout</span>
             </button>
           )}
         </nav>

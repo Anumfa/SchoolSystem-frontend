@@ -37,6 +37,124 @@
 .action-btn.interview:hover { background: #1d4ed8; color: #fff; }
 .action-btn.reject { background: #fee2e2; color: #b91c1c; }
 .action-btn.reject:hover { background: #b91c1c; color: #fff; }
+.action-btn.view { background: #f1f5f9; color: var(--green-800); }
+.action-btn.view:hover { background: var(--green-800); color: #fff; }
+
+/* ---- Admission application details modal ---- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(6, 78, 59, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 640px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 26px;
+}
+
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.modal-head h3 { font-size: 1.15rem; }
+
+.modal-close {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: var(--cream-2);
+  color: var(--gray);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modal-close:hover { background: #fee2e2; color: #b91c1c; }
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.detail-item {
+  min-width: 0;
+  padding: 10px 14px;
+  background: var(--cream-2);
+  border-radius: 10px;
+}
+
+.detail-item.full { grid-column: 1 / -1; }
+
+.detail-item span {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--gray);
+}
+
+.detail-item strong {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--dark);
+  word-break: break-word;
+}
+
+.detail-note {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: var(--cream-2);
+  border-radius: 10px;
+}
+
+.detail-note span {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--gray);
+}
+
+.detail-note strong { font-size: 0.9rem; color: var(--dark); }
+
+.modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid #e2e8f0;
+}
+
+@media (max-width: 560px) {
+  .modal-card { padding: 20px; }
+  .detail-grid { grid-template-columns: 1fr; }
+  .modal-actions .btn { flex: 1; justify-content: center; }
+}
+
 
 .contact-link {
   color: var(--green-800);

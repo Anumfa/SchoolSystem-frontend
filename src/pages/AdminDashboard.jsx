@@ -14,6 +14,7 @@ const AdminDashboard = () => {
   const [admissions, setAdmissions] = useState([]);
   const [tab, setTab] = useState('overview');
   const [toast, setToast] = useState('');
+  const [selected, setSelected] = useState(null);
 
   useEffect(() => {
     if (!user || user.role !== 'admin') {
@@ -35,7 +36,8 @@ const AdminDashboard = () => {
   const updateAdmission = async (id, status) => {
     try {
       await api.put(`/admissions/${id}`, { status });
-      setAdmissions(admissions.map((a) => (a._id === id ? { ...a, status } : a)));
+      setAdmissions((prev) => prev.map((a) => (a._id === id ? { ...a, status } : a)));
+      setSelected((cur) => (cur && cur._id === id ? { ...cur, status } : cur));
       setToast(`Application marked as ${status} ✅`);
       setTimeout(() => setToast(''), 3000);
     } catch (err) {
@@ -109,7 +111,7 @@ const AdminDashboard = () => {
               ) : (
                 <table className="fee-table">
                   <thead>
-                    <tr><th>Student</th><th>Class</th><th>Phone</th><th>Email</th><th>Status</th></tr>
+                    <tr><th>Student</th><th>Class</th><th>Phone</th><th>Email</th><th>Status</th><th>Details</th></tr>
                   </thead>
                   <tbody>
                     {admissions.slice(0, 5).map((a) => (
@@ -120,6 +122,11 @@ const AdminDashboard = () => {
                         <td><a className="contact-link" href={`mailto:${a.email}`}>{a.email}</a></td>
                         <td>
                           <span className={`status-chip ${a.status}`}>{a.status}</span>
+                        </td>
+                        <td>
+                          <div className="action-btns">
+                            <button className="action-btn view" title="View full details" onClick={() => setSelected(a)}>👁️</button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -195,9 +202,10 @@ const AdminDashboard = () => {
                     <td><span className={`status-chip ${a.status}`}>{a.status}</span></td>
                     <td>
                       <div className="action-btns">
-                        <button className="action-btn approve" onClick={() => updateAdmission(a._id, 'approved')}>✓</button>
-                        <button className="action-btn interview" onClick={() => updateAdmission(a._id, 'interview')}>👥</button>
-                        <button className="action-btn reject" onClick={() => updateAdmission(a._id, 'rejected')}>✗</button>
+                        <button className="action-btn view" title="View full details" onClick={() => setSelected(a)}>👁️</button>
+                        <button className="action-btn approve" title="Approve" onClick={() => updateAdmission(a._id, 'approved')}>✓</button>
+                        <button className="action-btn interview" title="Interview" onClick={() => updateAdmission(a._id, 'interview')}>👥</button>
+                        <button className="action-btn reject" title="Reject" onClick={() => updateAdmission(a._id, 'rejected')}>✗</button>
                       </div>
                     </td>
                   </tr>
@@ -223,7 +231,7 @@ const AdminDashboard = () => {
                     <td>{new Date(e.date).toLocaleDateString('en-GB')}</td>
                     <td>{e.venue}</td>
                     <td><span className="status-chip">{e.status}</span></td>
-                    <td><button className="action-btn reject" onClick={() => deleteEvent(e._id)}>🗑️</button></td>
+                    <td><button className="action-btn reject" title="Delete event" onClick={() => deleteEvent(e._id)}>🗑️</button></td>
                   </tr>
                 ))}
               </tbody>
@@ -231,6 +239,43 @@ const AdminDashboard = () => {
           </div>
         )}
       </div>
+
+      {selected && (
+        <div className="modal-overlay" onClick={() => setSelected(null)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-head">
+              <h3>📋 Admission Application Details</h3>
+              <button className="modal-close" onClick={() => setSelected(null)} aria-label="Close details">✕</button>
+            </div>
+
+            <div className="detail-grid">
+              <div className="detail-item"><span>Student Name</span><strong>{selected.studentName}</strong></div>
+              <div className="detail-item"><span>Class Applied For</span><strong>{selected.classApplyingFor}</strong></div>
+              <div className="detail-item"><span>Father's Name</span><strong>{selected.fatherName || '—'}</strong></div>
+              <div className="detail-item"><span>Mother's Name</span><strong>{selected.motherName || '—'}</strong></div>
+              <div className="detail-item"><span>Date of Birth</span><strong>{selected.dateOfBirth ? new Date(selected.dateOfBirth).toLocaleDateString('en-GB') : '—'}</strong></div>
+              <div className="detail-item"><span>Gender</span><strong>{selected.gender || '—'}</strong></div>
+              <div className="detail-item"><span>Phone</span><strong>{selected.phone ? <a className="contact-link" href={`tel:${selected.phone}`}>{selected.phone}</a> : '—'}</strong></div>
+              <div className="detail-item"><span>Email</span><strong>{selected.email ? <a className="contact-link" href={`mailto:${selected.email}`}>{selected.email}</a> : '—'}</strong></div>
+              <div className="detail-item"><span>Previous School</span><strong>{selected.previousSchool || '—'}</strong></div>
+              <div className="detail-item"><span>Last Class Marks / Grade</span><strong>{selected.lastMarks || '—'}</strong></div>
+              <div className="detail-item full"><span>Home Address</span><strong>{selected.address || '—'}</strong></div>
+              <div className="detail-item"><span>Applied On</span><strong>{selected.createdAt ? new Date(selected.createdAt).toLocaleString('en-GB') : '—'}</strong></div>
+              <div className="detail-item"><span>Current Status</span><strong><span className={`status-chip ${selected.status}`}>{selected.status}</span></strong></div>
+            </div>
+
+            {selected.remarks && (
+              <div className="detail-note"><span>Remarks</span><strong>{selected.remarks}</strong></div>
+            )}
+
+            <div className="modal-actions">
+              <button className="btn btn-green" onClick={() => updateAdmission(selected._id, 'approved')}>✓ Approve</button>
+              <button className="btn btn-outline" onClick={() => updateAdmission(selected._id, 'interview')}>👥 Interview</button>
+              <button className="btn btn-outline" onClick={() => updateAdmission(selected._id, 'rejected')}>✗ Reject</button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

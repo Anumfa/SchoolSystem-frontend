@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api.js';
+import PortalAuth from '../components/PortalAuth.jsx';
 import './PageStyles.css';
 import './Portal.css';
 
@@ -8,10 +9,6 @@ const TeacherPortal = () => {
   const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('bfhs_user') || 'null'));
   const [profile, setProfile] = useState(null);
   const [students, setStudents] = useState([]);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -26,22 +23,6 @@ const TeacherPortal = () => {
     }
   }, [user]);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    try {
-      const { data } = await api.post('/auth/login', { email, password, role: 'teacher' });
-      localStorage.setItem('bfhs_token', data.token);
-      localStorage.setItem('bfhs_user', JSON.stringify(data));
-      setUser(data);
-    } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleLogout = () => {
     localStorage.removeItem('bfhs_token');
     localStorage.removeItem('bfhs_user');
@@ -51,34 +32,13 @@ const TeacherPortal = () => {
 
   if (!user || user.role !== 'teacher') {
     return (
-      <section className="auth-section">
-        <div className="container">
-          <div className="auth-card fade-up">
-            <div className="auth-head">
-              <div className="auth-icon">👩‍🏫</div>
-              <h2>Teacher Portal</h2>
-              <p>Log in to manage your classes & students</p>
-            </div>
-            {error && <div className="alert alert-error">{error}</div>}
-            <form onSubmit={handleLogin}>
-              <div className="form-group">
-                <label>Email</label>
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="teacher@bfhs.edu.pk" />
-              </div>
-              <div className="form-group">
-                <label>Password</label>
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="••••••••" />
-              </div>
-              <button type="submit" className="btn btn-green" disabled={loading} style={{ width: '100%', justifyContent: 'center' }}>
-                {loading ? 'Logging in…' : 'Login to Portal →'}
-              </button>
-            </form>
-            <div className="auth-hint">
-              Demo teacher login: <strong>ayesha@bfhs.edu.pk</strong> / <strong>teacher123</strong>
-            </div>
-          </div>
-        </div>
-      </section>
+      <PortalAuth
+        role="teacher"
+        icon="👩‍🏫"
+        title="Teacher Portal"
+        subtitle="Log in to manage your classes & students"
+        onSuccess={(data) => setUser(data)}
+      />
     );
   }
 
