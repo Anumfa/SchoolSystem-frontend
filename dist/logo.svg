@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <path d="M32 2 L60 12 V34 C60 48 48 58 32 62 C16 58 4 48 4 34 V12 Z" fill="#14532d"/>
-  <path d="M32 7 L55 15 V33 C55 44 45 52 32 56 C19 52 9 44 9 33 V15 Z" fill="#ffffff"/>
-  <path d="M32 12 L50 18 V32 C50 40 42 46 32 49 C22 46 14 40 14 32 V18 Z" fill="#166534"/>
-  <path d="M32 17 L45 21 V31 C45 36 39 40 32 42 C25 40 19 36 19 31 V21 Z" fill="#fbbf24"/>
-  <path d="M32 20 L40 23 V29 C40 32 36 34 32 35 C28 34 24 32 24 29 V23 Z" fill="#166534"/>
-  <text x="32" y="33" font-family="Georgia, serif" font-size="9" font-weight="bold" fill="#ffffff" text-anchor="middle">BF</text>
-</svg>
