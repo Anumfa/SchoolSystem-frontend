@@ -30,6 +30,8 @@
   font-weight: 800;
   color: var(--gold-400);
   line-height: 1.1;
+  /* keeps the width steady while the number counts up */
+  font-variant-numeric: tabular-nums;
 }
 
 .stat-label {
