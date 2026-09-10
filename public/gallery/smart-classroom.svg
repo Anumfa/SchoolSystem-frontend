@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" role="img" aria-label="Smart classroom">
+  <rect width="800" height="600" fill="#eef2ff" />
+  <rect y="440" width="800" height="160" fill="#c7b299" />
+  <rect y="434" width="800" height="12" fill="#a1897a" />
+  <g>
+    <rect x="150" y="80" width="500" height="290" rx="12" fill="#ffffff" stroke="#475569" stroke-width="6" />
+    <rect x="168" y="98" width="464" height="254" rx="6" fill="#1e3a8a" />
+    <text x="400" y="180" font-family="Poppins,sans-serif" font-size="42" font-weight="700" fill="#ffffff" text-anchor="middle">Grade 7 — Maths</text>
+    <text x="400" y="238" font-family="Poppins,sans-serif" font-size="34" fill="#93c5fd" text-anchor="middle">3x + 5 = 20</text>
+    <rect x="210" y="272" width="380" height="12" rx="6" fill="#3b82f6" opacity="0.6" />
+    <rect x="210" y="298" width="270" height="12" rx="6" fill="#3b82f6" opacity="0.4" />
+    <circle cx="600" cy="120" r="8" fill="#22c55e" />
+  </g>
+  <rect x="330" y="370" width="140" height="16" rx="6" fill="#64748b" />
+  <g>
+    <rect x="80" y="392" width="200" height="16" rx="6" fill="#a16207" />
+    <rect x="92" y="408" width="14" height="70" fill="#92400e" />
+    <rect x="254" y="408" width="14" height="70" fill="#92400e" />
+    <rect x="110" y="360" width="60" height="34" rx="4" fill="#ffffff" stroke="#94a3b8" stroke-width="3" />
+    <rect x="196" y="360" width="60" height="34" rx="4" fill="#ffffff" stroke="#94a3b8" stroke-width="3" />
+  </g>
+  <g>
+    <rect x="520" y="392" width="200" height="16" rx="6" fill="#a16207" />
+    <rect x="532" y="408" width="14" height="70" fill="#92400e" />
+    <rect x="694" y="408" width="14" height="70" fill="#92400e" />
+    <rect x="550" y="360" width="60" height="34" rx="4" fill="#ffffff" stroke="#94a3b8" stroke-width="3" />
+    <rect x="636" y="360" width="60" height="34" rx="4" fill="#ffffff" stroke="#94a3b8" stroke-width="3" />
+  </g>
+  <rect x="330" y="386" width="140" height="10" rx="4" fill="#a16207" />
+  <g>
+    <rect x="360" y="440" width="80" height="70" rx="6" fill="#7c2d12" />
+    <rect x="386" y="446" width="28" height="6" fill="#f59e0b" />
+  </g>
+</svg>

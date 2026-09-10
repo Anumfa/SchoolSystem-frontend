@@ -5,6 +5,55 @@ import './PageStyles.css';
 import './Portal.css';
 import './AdminDashboard.css';
 
+// Artwork that ships with the site — offered as one-click picks in the admin forms
+const sampleImages = [
+  { label: 'Campus Building', value: '/gallery/campus-building.svg' },
+  { label: 'Sports Gala', value: '/gallery/sports-gala.svg' },
+  { label: 'Science Lab', value: '/gallery/science-lab.svg' },
+  { label: 'Independence Day', value: '/gallery/independence-day.svg' },
+  { label: 'Smart Classroom', value: '/gallery/smart-classroom.svg' },
+  { label: 'Library', value: '/gallery/library.svg' },
+  { label: 'Computer Lab', value: '/gallery/computer-lab.svg' },
+  { label: 'Arts Exhibition', value: '/gallery/arts-exhibition.svg' },
+];
+
+const eventCategories = ['Sports', 'Academics', 'Cultural', 'Annual', 'Religious', 'Other'];
+const eventStatuses = ['upcoming', 'ongoing', 'completed'];
+const galleryCategories = ['Campus', 'Events', 'Sports', 'Classrooms', 'Other'];
+
+const emptyEvent = {
+  title: '',
+  description: '',
+  date: '',
+  time: '',
+  venue: '',
+  category: 'Sports',
+  status: 'upcoming',
+  image: '',
+  featured: false,
+};
+
+const emptyGalleryItem = { title: '', category: 'Campus', image: '', description: '' };
+
+const ImagePicker = ({ onPick }) => (
+  <div className="image-picker">
+    <span className="image-picker-hint">Ya phir neeche se koi sample image chunein:</span>
+    <div className="image-picker-grid">
+      {sampleImages.map((img) => (
+        <button
+          key={img.value}
+          type="button"
+          className="image-pick"
+          title={img.label}
+          onClick={() => onPick(img.value)}
+        >
+          <img src={img.value} alt={img.label} loading="lazy" />
+        </button>
+      ))}
+    </div>
+  </div>
+);
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('bfhs_user') || 'null'));
@@ -15,6 +64,10 @@ const AdminDashboard = () => {
   const [tab, setTab] = useState('overview');
   const [toast, setToast] = useState('');
   const [selected, setSelected] = useState(null);
+  const [gallery, setGallery] = useState([]);
+  const [eventForm, setEventForm] = useState(emptyEvent);
+  const [galleryForm, setGalleryForm] = useState(emptyGalleryItem);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!user || user.role !== 'admin') {
@@ -25,6 +78,7 @@ const AdminDashboard = () => {
     api.get('/teachers').then((r) => setTeachers(r.data)).catch(() => {});
     api.get('/events').then((r) => setEvents(r.data)).catch(() => {});
     api.get('/admissions').then((r) => setAdmissions(r.data)).catch(() => {});
+    api.get('/gallery').then((r) => setGallery(r.data)).catch(() => {});
   }, [user, navigate]);
 
   const logout = () => {
@@ -53,6 +107,51 @@ const AdminDashboard = () => {
       setTimeout(() => setToast(''), 3000);
     } catch (err) {
       setToast('Failed to delete ❌');
+    }
+  };
+
+  const notify = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(''), 3000);
+  };
+
+  const createEvent = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const { data } = await api.post('/events', eventForm);
+      setEvents((prev) => [...prev, data].sort((a, b) => new Date(a.date) - new Date(b.date)));
+      setEventForm(emptyEvent);
+      notify('Event added ✅');
+    } catch (err) {
+      notify(err.response?.data?.message || 'Failed to add event ❌');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const createGalleryItem = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const { data } = await api.post('/gallery', { ...galleryForm, order: gallery.length });
+      setGallery((prev) => [...prev, data]);
+      setGalleryForm(emptyGalleryItem);
+      notify('Gallery image added ✅');
+    } catch (err) {
+      notify(err.response?.data?.message || 'Failed to add image ❌');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const deleteGalleryItem = async (id) => {
+    try {
+      await api.delete(`/gallery/${id}`);
+      setGallery((prev) => prev.filter((g) => g._id !== id));
+      notify('Gallery image deleted 🗑️');
+    } catch (err) {
+      notify('Failed to delete ❌');
     }
   };
 
@@ -88,6 +187,7 @@ const AdminDashboard = () => {
             ['teachers', `👩‍🏫 Teachers (${teachers.length})`],
             ['admissions', `📋 Applications (${admissions.length})`],
             ['events', `📅 Events (${events.length})`],
+            ['gallery', `🖼️ Gallery (${gallery.length})`],
           ].map(([key, label]) => (
             <button key={key} className={`filter-btn ${tab === key ? 'active' : ''}`} onClick={() => setTab(key)}>
               {label}
@@ -217,26 +317,225 @@ const AdminDashboard = () => {
 
         {/* Events */}
         {tab === 'events' && (
-          <div className="card">
-            <h3 className="mb-2">📅 Manage Events</h3>
-            <table className="fee-table">
-              <thead>
-                <tr><th>Title</th><th>Category</th><th>Date</th><th>Venue</th><th>Status</th><th>Delete</th></tr>
-              </thead>
-              <tbody>
-                {events.map((e) => (
-                  <tr key={e._id}>
-                    <td>{e.title}</td>
-                    <td>{e.category}</td>
-                    <td>{new Date(e.date).toLocaleDateString('en-GB')}</td>
-                    <td>{e.venue}</td>
-                    <td><span className="status-chip">{e.status}</span></td>
-                    <td><button className="action-btn reject" title="Delete event" onClick={() => deleteEvent(e._id)}>🗑️</button></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <>
+            <div className="card admin-form-card">
+              <h3 className="mb-2">➕ Add New Event</h3>
+              <form className="admin-form" onSubmit={createEvent}>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Event Title *</label>
+                    <input
+                      value={eventForm.title}
+                      onChange={(e) => setEventForm({ ...eventForm, title: e.target.value })}
+                      required
+                      placeholder="e.g. Annual Sports Gala 2027"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Date *</label>
+                    <input
+                      type="date"
+                      value={eventForm.date}
+                      onChange={(e) => setEventForm({ ...eventForm, date: e.target.value })}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Time</label>
+                    <input
+                      value={eventForm.time}
+                      onChange={(e) => setEventForm({ ...eventForm, time: e.target.value })}
+                      placeholder="e.g. 9:00 AM"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Venue</label>
+                    <input
+                      value={eventForm.venue}
+                      onChange={(e) => setEventForm({ ...eventForm, venue: e.target.value })}
+                      placeholder="e.g. School Ground"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Category</label>
+                    <select
+                      value={eventForm.category}
+                      onChange={(e) => setEventForm({ ...eventForm, category: e.target.value })}
+                    >
+                      {eventCategories.map((c) => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Status</label>
+                    <select
+                      value={eventForm.status}
+                      onChange={(e) => setEventForm({ ...eventForm, status: e.target.value })}
+                    >
+                      {eventStatuses.map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Description</label>
+                  <textarea
+                    rows="3"
+                    value={eventForm.description}
+                    onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })}
+                    placeholder="Short description shown on the Events page"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Image</label>
+                  <input
+                    value={eventForm.image}
+                    onChange={(e) => setEventForm({ ...eventForm, image: e.target.value })}
+                    placeholder="/gallery/sports-gala.svg  or  https://..."
+                  />
+                  <ImagePicker onPick={(v) => setEventForm({ ...eventForm, image: v })} />
+                  {eventForm.image && (
+                    <img className="admin-image-preview" src={eventForm.image} alt="Event preview" />
+                  )}
+                </div>
+
+                <label className="checkbox-row">
+                  <input
+                    type="checkbox"
+                    checked={eventForm.featured}
+                    onChange={(e) => setEventForm({ ...eventForm, featured: e.target.checked })}
+                  />
+                  <span>Home page par featured dikhayein</span>
+                </label>
+
+                <button type="submit" className="btn btn-green" disabled={saving}>
+                  {saving ? 'Saving…' : 'Add Event →'}
+                </button>
+              </form>
+            </div>
+
+            <div className="card">
+              <h3 className="mb-2">📅 All Events ({events.length})</h3>
+              <table className="fee-table">
+                <thead>
+                  <tr><th>Image</th><th>Title</th><th>Category</th><th>Date</th><th>Venue</th><th>Status</th><th>Delete</th></tr>
+                </thead>
+                <tbody>
+                  {events.map((e) => (
+                    <tr key={e._id}>
+                      <td>{e.image ? <img className="admin-thumb" src={e.image} alt={e.title} loading="lazy" /> : '—'}</td>
+                      <td>{e.title}</td>
+                      <td>{e.category}</td>
+                      <td>{new Date(e.date).toLocaleDateString('en-GB')}</td>
+                      <td>{e.venue}</td>
+                      <td><span className="status-chip">{e.status}</span></td>
+                      <td><button className="action-btn reject" title="Delete event" onClick={() => deleteEvent(e._id)}>🗑️</button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+
+        {/* Gallery */}
+        {tab === 'gallery' && (
+          <>
+            <div className="card admin-form-card">
+              <h3 className="mb-2">➕ Add Gallery Image</h3>
+              <form className="admin-form" onSubmit={createGalleryItem}>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Title *</label>
+                    <input
+                      value={galleryForm.title}
+                      onChange={(e) => setGalleryForm({ ...galleryForm, title: e.target.value })}
+                      required
+                      placeholder="e.g. Annual Prize Distribution"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Category</label>
+                    <select
+                      value={galleryForm.category}
+                      onChange={(e) => setGalleryForm({ ...galleryForm, category: e.target.value })}
+                    >
+                      {galleryCategories.map((c) => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Image URL / Path *</label>
+                  <input
+                    value={galleryForm.image}
+                    onChange={(e) => setGalleryForm({ ...galleryForm, image: e.target.value })}
+                    required
+                    placeholder="/gallery/library.svg  or  https://..."
+                  />
+                  <ImagePicker onPick={(v) => setGalleryForm({ ...galleryForm, image: v })} />
+                  {galleryForm.image && (
+                    <img className="admin-image-preview" src={galleryForm.image} alt="Gallery preview" />
+                  )}
+                </div>
+
+                <div className="form-group">
+                  <label>Description</label>
+                  <input
+                    value={galleryForm.description}
+                    onChange={(e) => setGalleryForm({ ...galleryForm, description: e.target.value })}
+                    placeholder="Lightbox me dikhne wala text"
+                  />
+                </div>
+
+                <button type="submit" className="btn btn-green" disabled={saving}>
+                  {saving ? 'Saving…' : 'Add Image →'}
+                </button>
+              </form>
+            </div>
+
+            <div className="card">
+              <h3 className="mb-2">🖼️ Gallery Images ({gallery.length})</h3>
+              {gallery.length === 0 ? (
+                <p style={{ color: 'var(--gray)' }}>No gallery images yet — pehli image upar se add karein.</p>
+              ) : (
+                <div className="admin-gallery-grid">
+                  {gallery.map((g) => (
+                    <div key={g._id} className="admin-gallery-item">
+                      {g.image ? (
+                        <img src={g.image} alt={g.title} loading="lazy" />
+                      ) : (
+                        <div className="admin-gallery-noimg">No image</div>
+                      )}
+                      <div className="admin-gallery-meta">
+                        <strong>{g.title}</strong>
+                        <span>{g.category}</span>
+                      </div>
+                      <button
+                        className="action-btn reject"
+                        title="Delete image"
+                        onClick={() => deleteGalleryItem(g._id)}
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
         )}
       </div>
 

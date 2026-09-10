@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" role="img" aria-label="Independence Day celebration">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f766e" />
+      <stop offset="100%" stop-color="#a7f3d0" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#sky)" />
+  <circle cx="132" cy="104" r="52" fill="#fde047" opacity="0.9" />
+  <rect y="440" width="800" height="160" fill="#15803d" />
+  <rect x="380" y="90" width="10" height="360" fill="#e5e7eb" />
+  <circle cx="385" cy="86" r="10" fill="#fcd34d" />
+  <rect x="390" y="110" width="240" height="160" fill="#ffffff" stroke="#e5e7eb" stroke-width="3" />
+  <rect x="390" y="110" width="240" height="160" fill="#166534" opacity="0.95" />
+  <rect x="390" y="110" width="80" height="160" fill="#ffffff" />
+  <g fill="#ffffff">
+    <path d="M640 130 q14 -12 28 0 q-8 14 -28 20 q-20 -6 -28 -20 q14 -12 28 0 z" fill="#15803d" />
+  </g>
+  <circle cx="500" cy="190" r="26" fill="#fde047" opacity="0.95" />
+  <circle cx="512" cy="182" r="24" fill="#166534" />
+  <g fill="#fcd34d">
+    <path d="M560 150 l6 14 l14 2 l-10 10 l3 14 l-13 -7 l-13 7 l3 -14 l-10 -10 l14 -2 z" />
+  </g>
+  <g fill="#065f46">
+    <circle cx="120" cy="420" r="20" />
+    <rect x="100" y="436" width="40" height="60" rx="16" />
+    <circle cx="196" cy="428" r="18" />
+    <rect x="178" y="442" width="36" height="54" rx="14" />
+    <circle cx="268" cy="420" r="20" />
+    <rect x="248" y="436" width="40" height="60" rx="16" />
+    <circle cx="640" cy="424" r="19" />
+    <rect x="621" y="439" width="38" height="57" rx="15" />
+    <circle cx="712" cy="430" r="17" />
+    <rect x="695" y="443" width="34" height="53" rx="13" />
+  </g>
+  <g>
+    <rect x="70" y="380" width="6" height="50" fill="#78350f" />
+    <rect x="76" y="382" width="34" height="22" fill="#166534" />
+    <rect x="700" y="386" width="6" height="46" fill="#78350f" />
+    <rect x="706" y="388" width="30" height="20" fill="#ffffff" />
+  </g>
+</svg>

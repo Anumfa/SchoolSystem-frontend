@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PageBanner from '../components/PageBanner.jsx';
+import api from '../api.js';
 import './PageStyles.css';
+import './Events.css';
 
 const GalleryThumb = ({ label }) => (
   <svg viewBox="0 0 320 220" width="100%" height="180" style={{ display: 'block' }}>
@@ -30,25 +32,43 @@ const GalleryThumb = ({ label }) => (
   </svg>
 );
 
-const categories = ['All', 'Campus', 'Events', 'Sports', 'Classrooms'];
+const baseCategories = ['Campus', 'Events', 'Sports', 'Classrooms', 'Other'];
 
-const galleryItems = [
-  { title: 'Main School Building', category: 'Campus' },
-  { title: 'Annual Sports Gala', category: 'Sports' },
-  { title: 'Science Lab', category: 'Campus' },
-  { title: 'Independence Day', category: 'Events' },
-  { title: 'Smart Classroom', category: 'Classrooms' },
-  { title: 'Library', category: 'Campus' },
-  { title: 'Computer Lab', category: 'Classrooms' },
-  { title: 'Arts Exhibition', category: 'Events' },
-  { title: 'Football Team', category: 'Sports' },
+// Static fallback — shown while loading, or if the backend has no gallery items yet.
+const staticGallery = [
+  { title: 'Main School Building', category: 'Campus', image: '/gallery/campus-building.svg' },
+  { title: 'Annual Sports Gala', category: 'Sports', image: '/gallery/sports-gala.svg' },
+  { title: 'Science Lab', category: 'Campus', image: '/gallery/science-lab.svg' },
+  { title: 'Independence Day', category: 'Events', image: '/gallery/independence-day.svg' },
+  { title: 'Smart Classroom', category: 'Classrooms', image: '/gallery/smart-classroom.svg' },
+  { title: 'Library', category: 'Campus', image: '/gallery/library.svg' },
+  { title: 'Computer Lab', category: 'Classrooms', image: '/gallery/computer-lab.svg' },
+  { title: 'Arts Exhibition', category: 'Events', image: '/gallery/arts-exhibition.svg' },
 ];
 
 const Gallery = () => {
+  const [items, setItems] = useState(staticGallery);
   const [filter, setFilter] = useState('All');
   const [open, setOpen] = useState(null);
 
-  const items = filter === 'All' ? galleryItems : galleryItems.filter((g) => g.category === filter);
+  useEffect(() => {
+    api
+      .get('/gallery')
+      .then((res) => {
+        // Use the dynamic gallery from the API whenever it has items
+        if (Array.isArray(res.data) && res.data.length > 0) setItems(res.data);
+      })
+      .catch(() => {
+        // keep the static fallback
+      });
+  }, []);
+
+  const categories = [
+    'All',
+    ...new Set([...items.map((i) => i.category).filter(Boolean), ...baseCategories]),
+  ];
+
+  const visible = filter === 'All' ? items : items.filter((g) => g.category === filter);
 
   return (
     <>
@@ -71,16 +91,30 @@ const Gallery = () => {
             ))}
           </div>
 
-          <div className="gallery-grid">
-            {items.map((g, i) => (
-              <div key={g.title + i} className="gallery-item fade-up" onClick={() => setOpen(g)}>
-                <GalleryThumb label={g.title + i} />
-                <div className="gallery-caption">
-                  <span>🔍 {g.title}</span>
+          {visible.length === 0 ? (
+            <p className="text-center" style={{ color: 'var(--gray)' }}>
+              No photos in this category yet.
+            </p>
+          ) : (
+            <div className="gallery-grid">
+              {visible.map((g, i) => (
+                <div
+                  key={g._id || g.title + i}
+                  className="gallery-item fade-up"
+                  onClick={() => setOpen(g)}
+                >
+                  {g.image ? (
+                    <img className="gallery-img" src={g.image} alt={g.title} loading="lazy" />
+                  ) : (
+                    <GalleryThumb label={g.title + i} />
+                  )}
+                  <div className="gallery-caption">
+                    <span>🔍 {g.title}</span>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -88,9 +122,13 @@ const Gallery = () => {
       {open && (
         <div className="lightbox" onClick={() => setOpen(null)}>
           <div className="lightbox-inner" onClick={(e) => e.stopPropagation()}>
-            <GalleryThumb label={'light' + open.title} />
+            {open.image ? (
+              <img className="lightbox-img" src={open.image} alt={open.title} />
+            ) : (
+              <GalleryThumb label={'light' + open.title} />
+            )}
             <h3>{open.title}</h3>
-            <p>Category: {open.category} — Bright Future High School</p>
+            <p>{open.description || `Category: ${open.category} — Bright Future High School`}</p>
             <button className="btn btn-gold" onClick={() => setOpen(null)}>Close ✕</button>
           </div>
         </div>
